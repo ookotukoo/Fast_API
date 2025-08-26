@@ -1,6 +1,7 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import FastAPI, Query, Path
+from pydantic import BaseModel, Field
 
 app = FastAPI()
 
@@ -54,3 +55,18 @@ async def read_items31(
     if size:
         results.update({"size": size})
     return results
+
+
+# Next day
+
+
+class FilterParams(BaseModel):
+    limit: int = Field(100, gt=0, le=100)
+    offset: int = Field(0, ge=0)
+    order_by: Literal["created_at", "updated_at"] = "created_at"
+    tags: list[str] = []
+
+
+@app.get("/items4/")
+async def read_items4(filter_query: Annotated[FilterParams, Query()]):
+    return filter_query
